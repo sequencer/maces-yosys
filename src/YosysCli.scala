@@ -1,8 +1,9 @@
-package maces.contrib.yosys
+package maces.yosys
 
 import maces.executor._
 
-class YosysCli extends MacesCli {
+class YosysCli(sc: ScratchPad) extends MacesCli {
+  override val scratchPad: _root_.maces.executor.ScratchPad = sc
 
   def yosysBin = read[String]("yosys_bin")
 
@@ -22,7 +23,7 @@ class YosysCli extends MacesCli {
   val readVerilog: CheckPoint = CP(s"read_verilog ${verilogs.reduce(_ + " " + _)}\n") {
     _.contains("Successfully")
   }
-  val readLibertyLibrary: CheckPoint = CP(s"read_liberty + ${libertyCellPaths.reduce(_ + " " + _)}\n") {
+  val readLibertyLibrary: CheckPoint = CP(s"read_liberty ${libertyCellPaths.reduce(_ + " " + _)}\n") {
     _.contains("Imported")
   }
   val hierarchyCheckAndOpt: CheckPoint = CP(s"hierarchy -check -top $topName; proc; opt; fsm; opt; memory; opt; techmap; opt;\n") {
@@ -31,10 +32,10 @@ class YosysCli extends MacesCli {
       // There are 4 opt passes.
       str.sliding(targetString.length).count(window => window == targetString) == 4
   }
-  val mapCell: CheckPoint = CP(s"dfflibmap -liberty ${libertyCellPaths.reduce(_ + " " + _)} \n") {
+  val mapCell: CheckPoint = CP(s"dfflibmap -liberty ${libertyCellPaths.reduce(_ + " " + _)}\n") {
     _.contains("Mapping DFF cells in module")
   }
-  val writeVerilog: CheckPoint = CP(s"write_verilog $outOptVerilog\\n") {
+  val writeVerilog: CheckPoint = CP(s"write_verilog $outOptVerilog\n") {
     _.contains("Dumping module")
   }
   val exit = CP("exit\n") {
@@ -43,5 +44,7 @@ class YosysCli extends MacesCli {
   init := readVerilog
   readVerilog := readLibertyLibrary
   readLibertyLibrary := hierarchyCheckAndOpt
+  hierarchyCheckAndOpt := mapCell
   mapCell := writeVerilog
+  writeVerilog := exit
 }
