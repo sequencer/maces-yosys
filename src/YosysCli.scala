@@ -1,19 +1,21 @@
 package maces.yosys
 
-import maces.executor._
+import maces._
+import executor._
+import os._
 
 class YosysCli(sc: ScratchPad) extends MacesCli {
   override val scratchPad: _root_.maces.executor.ScratchPad = sc
 
-  def yosysBin = read[String]("yosys_bin")
+  def yosysBin = read[Path]("yosys_bin").toString
 
-  def verilogs = read[Seq[String]]("verilogs")
+  def verilogs = read[Seq[Path]]("verilogs").map(_.toString)
 
-  def libertyCellPaths = read[Seq[String]]("liberty_cell_paths")
+  def libertyCellPaths = read[Seq[String]]("liberty_cell_paths").map(_.toString)
 
   def topName = read[String]("top_name")
 
-  def outOptVerilog = read[String]("out_opt_verilog")
+  def outOptVerilog = read[String]("out_opt_verilog").toString
 
   def entry: CheckPoint = init
 
