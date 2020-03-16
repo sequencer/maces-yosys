@@ -21,7 +21,9 @@ class YosysCli(sc: ScratchPad) extends MacesCli {
 
   def command: Seq[String] = Seq(yosysBin)
 
-  val init: CheckPoint = CP("") { str => str.contains("yosys>") }
+  val init: CheckPoint = CP("") {
+    _.contains("yosys>")
+  }
   val readVerilog: CheckPoint = CP(s"read_verilog ${verilogs.reduce(_ + " " + _)}\n") {
     _.contains("Successfully")
   }
