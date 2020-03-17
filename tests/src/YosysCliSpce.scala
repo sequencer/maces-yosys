@@ -19,10 +19,12 @@ object YosysCliSpce extends MacesTestSuite {
       sc.write("yosys_bin", Path("/usr/bin/yosys"))
       sc.write("verilogs", Seq(testPath / "GCD.v"))
       sc.write("top_name", "GCD")
-      sc.write("out_opt_verilog", testPath / "GCD.opt.v")
+      sc.write("out_opt_verilog", "GCD.opt.v")
       sc.write("liberty_cell_paths", Seq((resourcesDir / "asap7sc7p5t_24_SIMPLE_RVT_TT.lib")))
+      sc.write("workspace", testPath)
       val cli = new YosysCli(sc)
       cli.run
+      assert(os.isFile(testPath / cli.read[String]("out_opt_verilog")))
     }
   }
 }

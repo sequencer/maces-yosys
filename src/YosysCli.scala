@@ -15,7 +15,7 @@ class YosysCli(sc: ScratchPad) extends MacesCli {
 
   def topName = read[String]("top_name")
 
-  def outOptVerilog = read[String]("out_opt_verilog").toString
+  def outOptVerilog = (workspace / read[String]("out_opt_verilog")).toString
 
   def entry: CheckPoint = init
 
